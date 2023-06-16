@@ -169,6 +169,39 @@ const Weather = () => {
               } normal-case mt-2`}>
               {forecast ? "Tutup Prakiraan" : "Tampilkan Prakiraan"}
             </button>
+
+            {/* Open the modal using ID.showModal() method */}
+            <button
+              className='btn normal-case'
+              onClick={() => window.my_modal_5.showModal()}>
+              Tampilkan Detail
+            </button>
+            <dialog
+              id='my_modal_5'
+              className='modal modal-bottom sm:modal-middle'>
+              <form method='dialog' className='modal-box'>
+                <h3 className='font-bold text-lg'>Weather Details</h3>
+                {weather &&
+                  weather.forecast.forecastday[0].hour.map((hour) => (
+                    <div key={hour.time_epoch} className='py-4'>
+                      <figure>
+                        <img
+                          src={hour.condition.icon}
+                          alt={hour.condition.text}
+                          className='w-10 h-10'
+                        />
+                      </figure>
+                      <p className='font-bold'>{hour.time.split(" ")[1]}</p>
+                      <p>{weatherTranslations[hour.condition.text]}</p>
+                      <p>Suhu: {hour.temp_c}°C</p>
+                      {/* Add more details as needed */}
+                    </div>
+                  ))}
+                <div className='modal-action'>
+                  <button className='btn'>Close</button>
+                </div>
+              </form>
+            </dialog>
           </div>
         </div>
       ) : null}
