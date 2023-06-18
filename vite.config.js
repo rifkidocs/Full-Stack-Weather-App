@@ -1,10 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import reactRouter from "@vitejs/plugin-react-router";
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    middlewareMode: "html",
-  },
+  plugins: [react(), reactRouter()],
 });
