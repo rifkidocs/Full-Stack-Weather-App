@@ -2,7 +2,7 @@ import React from "react";
 
 const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
   return (
-    <div className='card bg-base-100 shadow-md mx-5 w-fit'>
+    <div className='card bg-base-100 shadow-md w-full sm:w-auto'>
       <figure className='px-10 pt-10'>
         <img
           src={weather.current.condition.icon}
@@ -53,7 +53,7 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
             <h3 className='font-bold text-lg'>Detail Cuaca</h3>
             {weather &&
               weather.forecast.forecastday[0].hour.map((hour) => (
-                <div key={hour.time_epoch}>
+                <div key={hour.time_epoch} className='text-left'>
                   <figure>
                     <img
                       src={hour.condition.icon}
@@ -62,8 +62,10 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
                     />
                   </figure>
                   <p className='font-bold'>{hour.time.split(" ")[1]}</p>
-                  <p>{weatherTranslations[hour.condition.text]}</p>
-                  <p>Suhu: {hour.temp_c}°C</p>
+                  <p className='text-left'>
+                    {weatherTranslations[hour.condition.text]}
+                  </p>
+                  <p className='text-left'>Suhu: {hour.temp_c}°C</p>
                   <div className='divider'></div>
                 </div>
               ))}

@@ -8,7 +8,7 @@ const InputFrom = ({
   setForecast,
 }) => {
   return (
-    <div className='mb-4 flex mx-6'>
+    <div className='mb-4 flex'>
       <input
         type='text'
         placeholder='Cari Kota'
