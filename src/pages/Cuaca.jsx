@@ -1,5 +1,5 @@
 import NavbarComp from "../components/NavbarComp";
-import Weather from "../components/Wheater";
+import Weather from "../components/Cuaca/Index";
 
 const Cuaca = () => {
   return (
