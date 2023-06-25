@@ -61,7 +61,7 @@ const NavbarComp = () => {
         <a
           onClick={() => navigate("/")}
           className='btn btn-ghost normal-case text-xl'>
-          F.wheater App
+          F.weather App
         </a>
       </div>
       <div className='navbar-center hidden lg:flex'>
