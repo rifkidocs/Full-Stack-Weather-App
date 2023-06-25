@@ -1,6 +1,6 @@
-import NavbarComp from "../components/NavbarComp";
+import NavbarComp from "../components/Navbar/NavbarPublic";
 import Hero from "../components/Homepage/Hero";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer/Index";
 
 const Homepage = () => {
   return (

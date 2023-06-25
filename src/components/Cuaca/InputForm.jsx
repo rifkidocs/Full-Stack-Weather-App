@@ -8,20 +8,20 @@ const InputFrom = ({
   setForecast,
 }) => {
   return (
-    <div className='mb-4 flex'>
+    <div className='mb-4 flex flex-col w-full max-w-md'>
       <input
         type='text'
         placeholder='Cari Kota'
         value={searchCity}
         onChange={handleCityChange}
-        className='input input-bordered input-secondary w-full max-w-xs'
+        className='input input-bordered rounded w-ful leading-tight focus:outline-none focus:shadow-outline'
       />
       <button
         onClick={() => {
           handleSearch();
           setForecast(false);
         }}
-        className='px-4 py-2 ml-2 rounded-lg btn btn-primary normal-case'>
+        className='rounded-lg btn btn-primary my-2'>
         Cari
       </button>
       <button
@@ -29,7 +29,7 @@ const InputFrom = ({
           handleAutoSearch();
           setForecast(false);
         }}
-        className='px-4 py-2 ml-2 rounded-lg btn btn-secondary normal-case'>
+        className='rounded-lg btn btn-secondary'>
         Otomatis
       </button>
     </div>

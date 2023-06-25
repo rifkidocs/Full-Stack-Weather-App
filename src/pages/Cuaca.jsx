@@ -1,6 +1,6 @@
-import NavbarComp from "../components/NavbarComp";
+import NavbarComp from "../components/Navbar/NavbarPublic";
 import Weather from "../components/Cuaca/Index";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer/Index";
 
 const Cuaca = () => {
   return (

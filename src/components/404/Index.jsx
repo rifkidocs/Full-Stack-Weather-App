@@ -1,5 +1,3 @@
-import React from "react";
-
 const NotFound = () => {
   return (
     <main className='h-screen flex flex-col justify-center items-center'>

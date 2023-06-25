@@ -10,19 +10,24 @@ const Weather = () => {
   const [searchCity, setSearchCity] = useState("");
   const [autoCity, setAutoCity] = useState("");
   const [forecast, setForecast] = useState(false);
+  const [shouldFetchData, setShouldFetchData] = useState(false);
 
   useEffect(() => {
-    fetchWeatherData();
-  }, []);
+    if (shouldFetchData) {
+      fetchWeatherData();
+      setShouldFetchData(false);
+    }
+  }, [shouldFetchData]);
 
   const fetchWeatherData = async () => {
     try {
       const response = await axios.get(
         `https://api.weatherapi.com/v1/forecast.json?key=f5099561e5ca4e09851145358231006&q=${
           searchCity ? searchCity : autoCity
-        }&days=9`
+        }&days=7`
       );
       setWeather(response.data);
+      setSearchCity("");
     } catch (error) {
       console.error("Error fetching weather data:", error);
     }
@@ -33,20 +38,13 @@ const Weather = () => {
   };
 
   const handleSearch = () => {
-    fetchWeatherData();
-    setSearchCity("");
+    setShouldFetchData(true); // Set shouldFetchData ke true saat tombol pencarian ditekan
   };
 
   const handleAutoSearch = () => {
     setAutoCity("auto:ip");
+    setShouldFetchData(true); // Set shouldFetchData ke true saat tombol pencarian otomatis ditekan
   };
-
-  useEffect(() => {
-    if (autoCity === "auto:ip") {
-      fetchWeatherData();
-      setAutoCity("");
-    }
-  }, [autoCity]);
 
   return (
     <div className='flex flex-col items-center min-h-screen place-items-center justify-center py-3 px-3 bg-base-200'>
