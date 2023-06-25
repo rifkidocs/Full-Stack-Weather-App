@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
-const Dashboard = () => {
+const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,4 +18,4 @@ const Dashboard = () => {
   return <div>Dashboard Content</div>;
 };
 
-export default Dashboard;
+export default Index;
