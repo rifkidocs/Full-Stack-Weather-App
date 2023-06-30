@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { auth, db } from "../../config/firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  arrayRemove,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import weatherTranslations from "../../constants";
 import MainCard from "../Cuaca/MainCard";
 import ForecastCard from "../Cuaca/ForecastCard";
 
 const Index = () => {
+  // Menginisialisasi state dan hooks
   const navigate = useNavigate();
   const [cityName, setCityName] = useState("");
   const [locations, setLocations] = useState([]);
@@ -17,14 +23,18 @@ const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [shouldFetchData, setShouldFetchData] = useState(true);
   const [weatherData, setWeatherData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   useEffect(() => {
+    // Mengatur pengubahan status otentikasi pengguna saat komponen dimuat
     const unsubscribe = onAuthStateChanged(auth, handleAuthStateChanged);
 
     return () => unsubscribe();
   }, []);
 
   const handleAuthStateChanged = (user) => {
+    // Menangani perubahan status otentikasi pengguna
     if (user) {
       fetchData(user.email);
     } else {
@@ -33,6 +43,7 @@ const Index = () => {
   };
 
   const fetchData = async (userEmail) => {
+    // Mengambil data lokasi dari Firestore berdasarkan email pengguna
     try {
       const userDocRef = doc(db, "Favlocations", userEmail);
       const docSnapshot = await getDoc(userDocRef);
@@ -54,7 +65,6 @@ const Index = () => {
     e.preventDefault();
 
     const formattedCityName = capitalizeFirstLetter(cityName);
-
     const userDocRef = doc(db, "Favlocations", auth.currentUser.email);
     const docSnapshot = await getDoc(userDocRef);
 
@@ -63,7 +73,7 @@ const Index = () => {
 
       if (location.length < 5) {
         location.push(formattedCityName);
-        await setDoc(userDocRef, { location }, { merge: true });
+        await updateDoc(userDocRef, { location });
         setLocations([...location]);
       } else {
         setMaxError(true);
@@ -75,14 +85,18 @@ const Index = () => {
       await setDoc(userDocRef, locationData);
       setLocations([formattedCityName]);
     }
-
+    // Memperbarui data cuaca setelah perubahan database
+    fetchWeatherData();
     setCityName("");
+    setShouldFetchData(true);
   };
 
   const capitalizeFirstLetter = (str) => {
+    // Mengubah huruf pertama dalam string menjadi huruf besar
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+  // Mengambil data cuaca ketika perubahan pada `shouldFetchData`
   useEffect(() => {
     if (shouldFetchData) {
       fetchWeatherData();
@@ -91,6 +105,7 @@ const Index = () => {
   }, [shouldFetchData]);
 
   const fetchWeatherData = async () => {
+    // Mengambil data cuaca untuk setiap lokasi menggunakan API weatherapi.com
     try {
       const weatherPromises = locations.map(async (location) => {
         const response = await axios.get(
@@ -107,6 +122,7 @@ const Index = () => {
   };
 
   const handleSetForecast = (index) => {
+    // Menangani pemilihan prakiraan cuaca untuk lokasi tertentu
     if (selectedLocation === index) {
       setSelectedLocation(null);
     } else {
@@ -114,31 +130,60 @@ const Index = () => {
     }
   };
 
+  const handleDeleteLocation = async (index) => {
+    // Menyiapkan penghapusan lokasi
+    setDeleteIndex(index);
+    setShowModal(true);
+  };
+
+  const confirmDeleteLocation = async () => {
+    // Mengkonfirmasi dan menghapus lokasi dari database Firestore
+    const userDocRef = doc(db, "Favlocations", auth.currentUser.email);
+    await updateDoc(userDocRef, {
+      location: arrayRemove(locations[deleteIndex]),
+    });
+    setLocations((prevLocations) =>
+      prevLocations.filter((_, i) => i !== deleteIndex)
+    );
+    setWeatherData((prevData) => prevData.filter((_, i) => i !== deleteIndex));
+    setShowModal(false);
+    setDeleteIndex(null);
+  };
+
   const handleShowDetail = () => {
-    // Handle logic for showing the detail modal here
-    // For example, set a state variable to control the modal visibility
+    // Menangani logika untuk menampilkan detail modal di sini
+    // Misalnya, mengatur variabel state untuk mengontrol keterlihatan modal
   };
 
   const closeModal = () => {
-    // Handle logic for closing the detail modal here
-    // For example, set the state variable to control the modal visibility to false
+    // Menutup modal
+    setShowModal(false);
+    setDeleteIndex(null);
   };
 
   const renderLocationTable = () => {
     if (locations.length > 0) {
       return (
-        <table>
+        <table className='table-auto'>
           <thead>
             <tr>
-              <th>No</th>
-              <th>Kota</th>
+              <th className='border px-4 py-2'>No</th>
+              <th className='border px-4 py-2'>Kota</th>
+              <th className='border px-4 py-2'>Action</th>
             </tr>
           </thead>
           <tbody>
             {locations.map((location, index) => (
               <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{location}</td>
+                <td className='border px-4 py-2'>{index + 1}</td>
+                <td className='border px-4 py-2'>{location}</td>
+                <td className='border px-4 py-2'>
+                  <button
+                    className='bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded'
+                    onClick={() => handleDeleteLocation(index)}>
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -150,6 +195,7 @@ const Index = () => {
   };
 
   const renderWeatherCards = () => {
+    // Render kartu-kartu cuaca
     if (weatherData.length > 0) {
       return weatherData.map((weather, index) => (
         <div key={index}>
@@ -174,21 +220,24 @@ const Index = () => {
   };
 
   return (
-    <div>
-      <h2>Dashboard</h2>
+    <div className='flex flex-col min-h-screen place-items-center justify-center py-3 px-3'>
+      <p className='text-xl font-bold px-2 xl:px-28 mb-3'>{`Halo`}</p>
 
-      <form onSubmit={handleFormSubmit}>
-        <label>
-          Nama Kota:
-          <input
-            type='text'
-            value={cityName}
-            onChange={(e) => setCityName(e.target.value)}
-            required
-          />
-        </label>
+      <form
+        className='flex justify-center place-items-center'
+        onSubmit={handleFormSubmit}>
+        <input
+          className='input input-bordered input-success w-full max-w-xs mr-2 focus:outline-none'
+          placeholder='Tambahkan  Kota'
+          type='text'
+          value={cityName}
+          onChange={(e) => setCityName(e.target.value)}
+          required
+        />
         {maxError && <span>Batas maksimal 5 field telah tercapai</span>}
-        <button type='submit'>Tambahkan</button>
+        <button className='btn btn-primary' type='submit'>
+          Tambahkan
+        </button>
       </form>
 
       {renderLocationTable()}
@@ -197,6 +246,28 @@ const Index = () => {
         <p>Data Lokasi Cuaca</p>
         {renderWeatherCards()}
       </div>
+
+      {showModal && (
+        <dialog
+          id='my_modal_5'
+          className='modal modal-bottom sm:modal-middle'
+          open>
+          <form method='dialog' className='modal-box'>
+            <h3 className='font-bold text-lg'>Konfirmasi Hapus</h3>
+            <p className='py-4'>
+              Apakah Anda yakin ingin menghapus lokasi ini?
+            </p>
+            <div className='modal-action'>
+              <button className='btn' onClick={confirmDeleteLocation}>
+                Hapus
+              </button>
+              <button className='btn' onClick={closeModal}>
+                Batal
+              </button>
+            </div>
+          </form>
+        </dialog>
+      )}
     </div>
   );
 };

@@ -55,7 +55,7 @@ const Login = () => {
               type='email'
               id='email'
               name='email'
-              className='appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+              className='input input-bordered input-success w-full mr-2 focus:outline-none'
             />
             <ErrorMessage
               name='email'
@@ -71,7 +71,7 @@ const Login = () => {
               type='password'
               id='password'
               name='password'
-              className='appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline'
+              className='input input-bordered input-success w-full mr-2 focus:outline-none'
             />
             <ErrorMessage
               name='password'

@@ -8,7 +8,7 @@ const Forecast = ({ weather, weatherTranslations }) => {
       </h3>
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-5'>
         {weather.forecast.forecastday.map((day) => (
-          <div key={day.date} className='card bg-base-100 shadow-md p-4'>
+          <div key={day.date} className='card bg-base-200 shadow-md p-4'>
             <figure>
               <img
                 src={day.day.condition.icon}

@@ -8,28 +8,30 @@ const InputFrom = ({
   setForecast,
 }) => {
   return (
-    <div className='mb-4 flex flex-col w-full max-w-md'>
-      <input
-        type='text'
-        placeholder='Cari Kota'
-        value={searchCity}
-        onChange={handleCityChange}
-        className='input input-bordered rounded w-ful leading-tight focus:outline-none focus:shadow-outline'
-      />
-      <button
-        onClick={() => {
-          handleSearch();
-          setForecast(false);
-        }}
-        className='rounded-lg btn btn-primary my-2'>
-        Cari
-      </button>
+    <div className='mb-4 max-w-xs'>
+      <div className='flex place-items-center'>
+        <input
+          type='text'
+          placeholder='Cari Kota'
+          value={searchCity}
+          onChange={handleCityChange}
+          className='input input-bordered input-accent  w-full mr-2 focus:outline-none'
+        />
+        <button
+          onClick={() => {
+            handleSearch();
+            setForecast(false);
+          }}
+          className='rounded-lg btn btn-primary my-2 normal-case'>
+          Cari
+        </button>
+      </div>
       <button
         onClick={() => {
           handleAutoSearch();
           setForecast(false);
         }}
-        className='rounded-lg btn btn-secondary'>
+        className='rounded-lg btn btn-secondary w-full normal-case'>
         Otomatis
       </button>
     </div>

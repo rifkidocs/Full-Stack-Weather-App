@@ -47,7 +47,7 @@ const Weather = () => {
   };
 
   return (
-    <div className='flex flex-col items-center min-h-screen place-items-center justify-center py-3 px-3 bg-base-200'>
+    <div className='flex flex-col items-center min-h-screen place-items-center justify-center py-3 px-3'>
       <InputFrom
         searchCity={searchCity}
         handleCityChange={handleCityChange}

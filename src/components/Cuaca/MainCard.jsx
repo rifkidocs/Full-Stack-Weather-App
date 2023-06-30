@@ -16,7 +16,7 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
   };
 
   return (
-    <div className='card bg-base-100 shadow-md w-full sm:w-auto'>
+    <div className='card bg-base-200 shadow-md w-full sm:w-auto'>
       <figure className='px-10 pt-10'>
         <img
           src={weather.current.condition.icon}
@@ -57,7 +57,7 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
         </button>
 
         {/* Open the modal using ref */}
-        <button className='btn normal-case' onClick={handleShowModal}>
+        <button className='btn btn-info normal-case' onClick={handleShowModal}>
           Tampilkan Detail
         </button>
         <dialog ref={modalRef} className='modal modal-bottom sm:modal-middle'>
