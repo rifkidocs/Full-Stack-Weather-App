@@ -1,6 +1,20 @@
-import React from "react";
+import React, { useRef } from "react";
 
 const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
+  const modalRef = useRef(null);
+
+  const handleShowModal = () => {
+    if (modalRef.current) {
+      modalRef.current.showModal();
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (modalRef.current) {
+      modalRef.current.close();
+    }
+  };
+
   return (
     <div className='card bg-base-100 shadow-md w-full sm:w-auto'>
       <figure className='px-10 pt-10'>
@@ -42,14 +56,15 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
           {forecast ? "Tutup Prakiraan" : "Tampilkan Prakiraan"}
         </button>
 
-        {/* Open the modal using ID.showModal() method */}
-        <button
-          className='btn normal-case'
-          onClick={() => window.my_modal_5.showModal()}>
+        {/* Open the modal using ref */}
+        <button className='btn normal-case' onClick={handleShowModal}>
           Tampilkan Detail
         </button>
-        <dialog id='my_modal_5' className='modal modal-bottom sm:modal-middle'>
+        <dialog ref={modalRef} className='modal modal-bottom sm:modal-middle'>
           <form method='dialog' className='modal-box'>
+            <button className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'>
+              ✕
+            </button>
             <h3 className='font-bold text-lg'>Detail Cuaca</h3>
             {weather &&
               weather.forecast.forecastday[0].hour.map((hour) => (
@@ -70,7 +85,9 @@ const MainCard = ({ weather, forecast, setForecast, weatherTranslations }) => {
                 </div>
               ))}
             <div className='modal-action'>
-              <button className='btn'>Close</button>
+              <button className='btn' onClick={handleCloseModal}>
+                Close
+              </button>
             </div>
           </form>
         </dialog>

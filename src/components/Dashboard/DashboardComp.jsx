@@ -12,27 +12,25 @@ import ForecastCard from "../Cuaca/ForecastCard";
 const Index = () => {
   const navigate = useNavigate();
   const [cityName, setCityName] = useState("");
-  const [locations, setLocations] = useState([]); // Menyimpan data array location
+  const [locations, setLocations] = useState([]);
   const [maxError, setMaxError] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null); // Menyimpan indeks lokasi yang dipilih
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [shouldFetchData, setShouldFetchData] = useState(true);
-  const [weatherData, setWeatherData] = useState([]); // Menyimpan data cuaca
+  const [weatherData, setWeatherData] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Pengguna telah masuk, dapatkan alamat email pengguna
-        const userEmail = user.email;
-        // Lakukan tindakan sesuai kebutuhan
-        fetchData(userEmail);
-      } else {
-        // Pengguna belum masuk, arahkan kembali ke halaman login
-        navigate("/login");
-      }
-    });
+    const unsubscribe = onAuthStateChanged(auth, handleAuthStateChanged);
 
     return () => unsubscribe();
-  }, []); // Gunakan dependensi kosong agar pemanggilan hanya dilakukan saat komponen dipasang
+  }, []);
+
+  const handleAuthStateChanged = (user) => {
+    if (user) {
+      fetchData(user.email);
+    } else {
+      navigate("/login");
+    }
+  };
 
   const fetchData = async (userEmail) => {
     try {
@@ -42,10 +40,10 @@ const Index = () => {
       if (docSnapshot.exists()) {
         const { location } = docSnapshot.data();
         setLocations(location);
-        setShouldFetchData(true); // Mengatur shouldFetchData ke true untuk memicu pemanggilan fetchWeatherData
+        setShouldFetchData(true);
       } else {
         setLocations([]);
-        setWeatherData([]); // Mengatur weatherData ke array kosong ketika tidak ada lokasi
+        setWeatherData([]);
       }
     } catch (err) {
       console.error("Error mengambil data lokasi:", err);
@@ -55,11 +53,8 @@ const Index = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Ubah huruf pertama menjadi huruf besar
-    const formattedCityName =
-      cityName.charAt(0).toUpperCase() + cityName.slice(1);
+    const formattedCityName = capitalizeFirstLetter(cityName);
 
-    // Simpan nama kota ke Firestore
     const userDocRef = doc(db, "Favlocations", auth.currentUser.email);
     const docSnapshot = await getDoc(userDocRef);
 
@@ -81,8 +76,11 @@ const Index = () => {
       setLocations([formattedCityName]);
     }
 
-    // Reset nilai input
     setCityName("");
+  };
+
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   useEffect(() => {
@@ -110,9 +108,68 @@ const Index = () => {
 
   const handleSetForecast = (index) => {
     if (selectedLocation === index) {
-      setSelectedLocation(null); // Menutup ForecastCard jika lokasi yang sama diaktifkan kembali
+      setSelectedLocation(null);
     } else {
-      setSelectedLocation(index); // Membuka ForecastCard untuk lokasi yang dipilih
+      setSelectedLocation(index);
+    }
+  };
+
+  const handleShowDetail = () => {
+    // Handle logic for showing the detail modal here
+    // For example, set a state variable to control the modal visibility
+  };
+
+  const closeModal = () => {
+    // Handle logic for closing the detail modal here
+    // For example, set the state variable to control the modal visibility to false
+  };
+
+  const renderLocationTable = () => {
+    if (locations.length > 0) {
+      return (
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Kota</th>
+            </tr>
+          </thead>
+          <tbody>
+            {locations.map((location, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td>{location}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    } else {
+      return <p>Data tidak tersedia</p>;
+    }
+  };
+
+  const renderWeatherCards = () => {
+    if (weatherData.length > 0) {
+      return weatherData.map((weather, index) => (
+        <div key={index}>
+          <MainCard
+            weather={weather}
+            forecast={selectedLocation === index}
+            setForecast={() => handleSetForecast(index)}
+            weatherTranslations={weatherTranslations}
+            showDetail={handleShowDetail}
+          />
+          {selectedLocation === index ? (
+            <ForecastCard
+              weather={weather}
+              weatherTranslations={weatherTranslations}
+            />
+          ) : null}
+        </div>
+      ));
+    } else {
+      return <p>Data prakiraan cuaca tidak tersedia</p>;
     }
   };
 
@@ -130,53 +187,15 @@ const Index = () => {
             required
           />
         </label>
-        {maxError ? <span>Batas maksimal 5 field telah tercapai</span> : null}
+        {maxError && <span>Batas maksimal 5 field telah tercapai</span>}
         <button type='submit'>Tambahkan</button>
       </form>
 
-      {locations.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Kota</th>
-            </tr>
-          </thead>
-          <tbody>
-            {locations.map((location, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{location}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>Data tidak tersedia</p>
-      )}
+      {renderLocationTable()}
 
       <div>
         <p>Data Lokasi Cuaca</p>
-        {weatherData.length > 0 ? (
-          weatherData.map((weather, index) => (
-            <div key={index}>
-              <MainCard
-                weather={weather}
-                forecast={selectedLocation === index} // Menyediakan nilai boolean yang menentukan apakah ForecastCard harus ditampilkan
-                setForecast={() => handleSetForecast(index)} // Menyediakan fungsi untuk mengubah status ForecastCard
-                weatherTranslations={weatherTranslations}
-              />
-              {selectedLocation === index ? (
-                <ForecastCard
-                  weather={weather}
-                  weatherTranslations={weatherTranslations}
-                />
-              ) : null}
-            </div>
-          ))
-        ) : (
-          <p>Data prakiraan cuaca tidak tersedia</p>
-        )}
+        {renderWeatherCards()}
       </div>
     </div>
   );
