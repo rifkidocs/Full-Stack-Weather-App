@@ -61,9 +61,6 @@ The project relies on the following dependencies:
 - `tailwindcss`: Highly customizable CSS framework.
 - `vite`: Fast build tool and development server.
 
-## License
-
-This project is private and not open-sourced.
 
 ## Note
 
