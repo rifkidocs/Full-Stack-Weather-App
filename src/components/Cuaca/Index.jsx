@@ -24,7 +24,7 @@ const Weather = () => {
       const response = await axios.get(
         `https://api.weatherapi.com/v1/forecast.json?key=f5099561e5ca4e09851145358231006&q=${
           searchCity ? searchCity : autoCity
-        }&days=7`
+        }&days=9`
       );
       setWeather(response.data);
       setSearchCity("");
