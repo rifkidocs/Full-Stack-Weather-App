@@ -1,4 +1,4 @@
-# Weather App Fullstack
+#Fullstack Weather App
 
 This repository contains the code for the Weather App Fullstack project. It is a fullstack application that utilizes React, Firebase, and other dependencies to provide weather-related functionalities.
 
