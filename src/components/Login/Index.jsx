@@ -36,6 +36,7 @@ const Login = () => {
 
       Cookies.set("loggedInUser", true);
       Cookies.set("displayUser", auth.currentUser.displayName);
+      Cookies.set("emailUser", auth.currentUser.email);
       navigate("/dashboard");
     } catch (error) {
       console.log("Error signing in:", error.message);

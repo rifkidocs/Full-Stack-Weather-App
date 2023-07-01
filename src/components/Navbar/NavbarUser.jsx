@@ -36,6 +36,7 @@ const NavbarComp = () => {
         // Logout successful
         Cookies.remove("loggedInUser");
         Cookies.remove("displayUser");
+        Cookies.remove("emailUser");
         navigate("/login"); // Ganti "/login" dengan rute halaman login
       })
       .catch((error) => {

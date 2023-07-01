@@ -29,6 +29,7 @@ const Index = () => {
   const [showTable, setShowTable] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editValue, setEditValue] = useState("");
+  const emailUser = Cookies.get("emailUser");
 
   useEffect(() => {
     const loggedInUser = Cookies.get("loggedInUser");
@@ -40,10 +41,10 @@ const Index = () => {
     }
   }, []);
 
-  const fetchData = async (userEmail) => {
+  const fetchData = async () => {
     // Mengambil data lokasi dari Firestore berdasarkan email pengguna
     try {
-      const userDocRef = doc(db, "Favlocations", userEmail);
+      const userDocRef = doc(db, "Favlocations", emailUser);
       const docSnapshot = await getDoc(userDocRef);
 
       if (docSnapshot.exists()) {
