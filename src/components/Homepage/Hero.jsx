@@ -11,7 +11,7 @@ const Hero = () => {
     if (loggedInUser && loggedInUser === "true") {
       navigate("/dashboard");
     } else {
-      navigate("/cuaca");
+      navigate("/");
     }
   }, []);
 
