@@ -73,12 +73,18 @@ const Index = () => {
     if (docSnapshot.exists()) {
       const { location } = docSnapshot.data();
 
-      if (location.length < 5) {
+      if (location && location.length < 5) {
         location.push(formattedCityName);
         await updateDoc(userDocRef, { location });
         setLocations([...location]);
-      } else {
+      } else if (location && location.length >= 5) {
         setMaxError(true);
+      } else {
+        const locationData = {
+          location: [formattedCityName],
+        };
+        await setDoc(userDocRef, locationData);
+        setLocations([formattedCityName]);
       }
     } else {
       const locationData = {
@@ -87,6 +93,7 @@ const Index = () => {
       await setDoc(userDocRef, locationData);
       setLocations([formattedCityName]);
     }
+
     // Memperbarui data cuaca setelah perubahan database
     fetchWeatherData();
     setCityName("");
@@ -175,24 +182,24 @@ const Index = () => {
   const displayUser = Cookies.get("displayUser");
 
   const renderLocationTable = () => {
-    if (locations.length > 0) {
-      return (
-        <table className='mt-3 w-full max-w-md text-sm text-left text-gray-500 dark:text-gray-400'>
-          <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
-            <tr>
-              <th scope='col' className='px-6 py-3'>
-                No
-              </th>
-              <th scope='col' className='px-6 py-3'>
-                Kota
-              </th>
-              <th scope='col' className='px-6 py-3'>
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {locations.map((location, index) => (
+    return (
+      <table className='mt-3 w-full max-w-md text-sm text-left text-gray-500 dark:text-gray-400'>
+        <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+          <tr>
+            <th scope='col' className='px-6 py-3'>
+              No
+            </th>
+            <th scope='col' className='px-6 py-3'>
+              Kota
+            </th>
+            <th scope='col' className='px-6 py-3'>
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {locations ? (
+            locations.map((location, index) => (
               <tr
                 key={index}
                 className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
@@ -206,13 +213,17 @@ const Index = () => {
                   </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    } else {
-      return <p>Data tidak tersedia</p>;
-    }
+            ))
+          ) : (
+            <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+              <td className='px-6 py-4'></td>
+              <td className='px-6 py-4'></td>
+              <td className='px-6 py-4'></td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    );
   };
 
   const renderWeatherCards = () => {
@@ -239,7 +250,7 @@ const Index = () => {
         </div>
       ));
     } else {
-      return <p>Data prakiraan cuaca tidak tersedia</p>;
+      return <p className='mt-3'>Data prakiraan cuaca tidak tersedia</p>;
     }
   };
 
