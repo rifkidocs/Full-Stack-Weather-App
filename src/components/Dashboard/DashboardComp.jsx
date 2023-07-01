@@ -9,7 +9,6 @@ import {
   updateDoc,
   arrayRemove,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import weatherTranslations from "../../constants";
 import MainCard from "../Cuaca/MainCard";
 import ForecastCard from "../Cuaca/ForecastCard";
@@ -24,25 +23,22 @@ const Index = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [shouldFetchData, setShouldFetchData] = useState(true);
   const [weatherData, setWeatherData] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [showTable, setShowTable] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   useEffect(() => {
-    // Mengatur pengubahan status otentikasi pengguna saat komponen dimuat
-    const unsubscribe = onAuthStateChanged(auth, handleAuthStateChanged);
+    const loggedInUser = Cookies.get("loggedInUser");
 
-    return () => unsubscribe();
-  }, []);
-
-  const handleAuthStateChanged = (user) => {
-    // Menangani perubahan status otentikasi pengguna
-    if (user) {
-      fetchData(user.email);
+    if (loggedInUser === "true") {
+      fetchData(auth?.currentUser?.email);
     } else {
       navigate("/login");
     }
-  };
+  }, []);
 
   const fetchData = async (userEmail) => {
     // Mengambil data lokasi dari Firestore berdasarkan email pengguna
@@ -96,8 +92,8 @@ const Index = () => {
 
     // Memperbarui data cuaca setelah perubahan database
     fetchWeatherData();
-    setCityName("");
     setShouldFetchData(true);
+    setCityName("");
   };
 
   const capitalizeFirstLetter = (str) => {
@@ -142,7 +138,14 @@ const Index = () => {
   const handleDeleteLocation = async (index) => {
     // Menyiapkan penghapusan lokasi
     setDeleteIndex(index);
-    setShowModal(true);
+    setShowModalDelete(true);
+  };
+
+  const handleEditLocation = async (index, value) => {
+    // Menyiapkan pengeditan lokasi
+    setEditIndex(index);
+    setEditValue(value);
+    setShowModalEdit(true);
   };
 
   const confirmDeleteLocation = async () => {
@@ -155,9 +158,20 @@ const Index = () => {
       prevLocations.filter((_, i) => i !== deleteIndex)
     );
     setWeatherData((prevData) => prevData.filter((_, i) => i !== deleteIndex));
-    setShowModal(false);
+    setShowModalDelete(false);
     setDeleteIndex(null);
     setMaxError(false);
+  };
+
+  const confirmEditLocation = async () => {
+    // Mengkonfirmasi dan mengedit lokasi pada database Firestore
+    const userDocRef = doc(db, "Favlocations", auth.currentUser.email);
+    const newLocations = [...locations];
+    newLocations[editIndex] = capitalizeFirstLetter(editValue);
+    await updateDoc(userDocRef, { location: newLocations });
+    setLocations(newLocations);
+    setShouldFetchData(true);
+    setShowModalEdit(false);
   };
 
   const handleShowDetail = () => {
@@ -175,7 +189,8 @@ const Index = () => {
 
   const closeModal = () => {
     // Menutup modal
-    setShowModal(false);
+    setShowModalDelete(false);
+    setShowModalEdit(false);
     setDeleteIndex(null);
   };
 
@@ -183,8 +198,8 @@ const Index = () => {
 
   const renderLocationTable = () => {
     return (
-      <table className='mt-3 w-full max-w-md text-sm text-left text-gray-500 dark:text-gray-400'>
-        <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+      <table className='table mt-3 w-full max-w-md text-md text-left'>
+        <thead className='text-slate-400 '>
           <tr>
             <th scope='col' className='px-6 py-3'>
               No
@@ -200,16 +215,19 @@ const Index = () => {
         <tbody>
           {locations ? (
             locations.map((location, index) => (
-              <tr
-                key={index}
-                className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+              <tr key={index}>
                 <td className='px-6 py-4'>{index + 1}</td>
                 <td className='px-6 py-4'>{location}</td>
                 <td className='px-6 py-4'>
                   <button
-                    className='bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded'
+                    className='bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded mr-1'
                     onClick={() => handleDeleteLocation(index)}>
                     Delete
+                  </button>
+                  <button
+                    className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded'
+                    onClick={() => handleEditLocation(index, location)}>
+                    Edit
                   </button>
                 </td>
               </tr>
@@ -272,7 +290,7 @@ const Index = () => {
           }}
           required
         />
-        <button className='btn btn-primary' type='submit'>
+        <button className='btn btn-primary normal-case' type='submit'>
           Tambahkan
         </button>
       </form>
@@ -288,7 +306,7 @@ const Index = () => {
             handleShowTable();
             setMaxError(false);
           }}
-          className='btn bg-neutral normal-case mt-3'>
+          className='btn bg-base-200 normal-case mt-3'>
           Sembunyikan Kota
         </button>
       ) : (
@@ -303,7 +321,7 @@ const Index = () => {
 
       {renderWeatherCards()}
 
-      {showModal && (
+      {showModalDelete && (
         <dialog
           id='my_modal_5'
           className='modal modal-bottom sm:modal-middle'
@@ -318,6 +336,32 @@ const Index = () => {
                 className='btn btn-success'
                 onClick={confirmDeleteLocation}>
                 Hapus
+              </button>
+              <button className='btn' onClick={closeModal}>
+                Batal
+              </button>
+            </div>
+          </form>
+        </dialog>
+      )}
+
+      {showModalEdit && (
+        <dialog
+          id='my_modal_5'
+          className='modal modal-bottom sm:modal-middle'
+          open>
+          <form method='dialog' className='modal-box'>
+            <h3 className='font-bold text-lg'>Edit Kota</h3>
+            <p className='py-4'>Masukkan nama kota yang keinginan anda!</p>
+            <input
+              className='input input-bordered input-primary w-full'
+              type='text'
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+            />
+            <div className='modal-action'>
+              <button className='btn btn-success' onClick={confirmEditLocation}>
+                Update
               </button>
               <button className='btn' onClick={closeModal}>
                 Batal

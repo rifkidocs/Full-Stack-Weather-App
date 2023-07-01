@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const NavbarComp = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,11 +23,23 @@ const NavbarComp = () => {
     localStorage.setItem("theme", updatedTheme);
   };
 
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLinkClick = (path) => {
+    navigate(path);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className='navbar bg-base-300 shadow-md px-2 xl:px-28'>
       <div className='navbar-start'>
         <div className='dropdown'>
-          <label tabIndex={0} className='btn btn-ghost lg:hidden'>
+          <label
+            tabIndex={0}
+            className='btn btn-ghost lg:hidden'
+            onClick={handleDropdownToggle}>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               className='h-5 w-5'
@@ -41,22 +54,24 @@ const NavbarComp = () => {
               />
             </svg>
           </label>
-          <ul
-            tabIndex={0}
-            className='menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 z-10'>
-            <li>
-              <a onClick={() => navigate("/")}>Beranda</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/cuaca")}>Cuaca</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/register")}>Daftar</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/login")}>Login</a>
-            </li>
-          </ul>
+          {isDropdownOpen && (
+            <ul
+              tabIndex={0}
+              className='menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 z-10'>
+              <li>
+                <a onClick={() => handleLinkClick("/")}>Beranda</a>
+              </li>
+              <li>
+                <a onClick={() => handleLinkClick("/cuaca")}>Cuaca</a>
+              </li>
+              <li>
+                <a onClick={() => handleLinkClick("/register")}>Daftar</a>
+              </li>
+              <li>
+                <a onClick={() => handleLinkClick("/login")}>Login</a>
+              </li>
+            </ul>
+          )}
         </div>
         <a
           onClick={() => navigate("/")}

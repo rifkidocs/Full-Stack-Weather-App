@@ -62,7 +62,7 @@ const Index = () => {
               type='text'
               id='fullName'
               name='fullName'
-              className='input input-bordered input-success w-full mr-2 focus:outline-none'
+              className='input input-bordered border-white w-full mr-2 focus:outline-none'
             />
             <ErrorMessage
               name='fullName'

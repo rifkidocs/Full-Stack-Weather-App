@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../config/firebase";
+import Cookies from "js-cookie";
 
 const NavbarComp = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,11 +26,32 @@ const NavbarComp = () => {
     localStorage.setItem("theme", updatedTheme);
   };
 
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        // Logout successful
+        Cookies.remove("loggedInUser");
+        Cookies.remove("displayUser");
+        navigate("/login"); // Ganti "/login" dengan rute halaman login
+      })
+      .catch((error) => {
+        // Error occurred during logout
+        console.log("Logout error:", error);
+      });
+  };
+
   return (
     <div className='navbar bg-base-300 shadow-md px-2 xl:px-28'>
       <div className='navbar-start'>
         <div className='dropdown'>
-          <label tabIndex={0} className='btn btn-ghost lg:hidden'>
+          <label
+            tabIndex={0}
+            className='btn btn-ghost lg:hidden'
+            onClick={handleDropdownToggle}>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               className='h-5 w-5'
@@ -41,41 +66,21 @@ const NavbarComp = () => {
               />
             </svg>
           </label>
-          <ul
-            tabIndex={0}
-            className='menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 z-10'>
-            <li>
-              <a onClick={() => navigate("/")}>Beranda</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/cuaca")}>Cuaca</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/register")}>Daftar</a>
-            </li>
-            <li>
-              <a onClick={() => navigate("/login")}>Login</a>
-            </li>
-          </ul>
+          {isDropdownOpen && (
+            <ul
+              tabIndex={0}
+              className='menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 z-10'>
+              <li>
+                <a onClick={handleLogout}>Logout</a>
+              </li>
+            </ul>
+          )}
         </div>
         <a
           onClick={() => navigate("/")}
           className='btn btn-ghost normal-case text-xl'>
           F.weather App
         </a>
-      </div>
-      <div className='navbar-center hidden lg:flex'>
-        <ul className='menu menu-horizontal px-1'>
-          <li>
-            <a onClick={() => navigate("/")}>Beranda</a>
-          </li>
-          <li>
-            <a onClick={() => navigate("/cuaca")}>Cuaca</a>
-          </li>
-          <li>
-            <a onClick={() => navigate("/login")}>Login</a>
-          </li>
-        </ul>
       </div>
       <div className='navbar-end'>
         <label className='swap swap-rotate px-5'>
@@ -103,9 +108,9 @@ const NavbarComp = () => {
           </svg>
         </label>
         <a
-          onClick={() => navigate("/register")}
-          className='btn btn-primary rounded-2xl normal-case hidden md:flex'>
-          Daftar Akun
+          onClick={handleLogout}
+          className='btn btn-warning rounded-2xl normal-case hidden md:flex'>
+          Logout
         </a>
       </div>
     </div>

@@ -4,13 +4,26 @@ import InputFrom from "./InputForm";
 import MainCard from "./MainCard";
 import Forecast from "./ForecastCard";
 import weatherTranslations from "../../constants";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Weather = () => {
+  const navigate = useNavigate();
   const [weather, setWeather] = useState(null);
   const [searchCity, setSearchCity] = useState("");
   const [autoCity, setAutoCity] = useState("");
   const [forecast, setForecast] = useState(false);
   const [shouldFetchData, setShouldFetchData] = useState(false);
+
+  useEffect(() => {
+    const loggedInUser = Cookies.get("loggedInUser");
+
+    if (loggedInUser && loggedInUser === "true") {
+      navigate("/dashboard");
+    } else {
+      navigate("/cuaca");
+    }
+  }, []);
 
   useEffect(() => {
     if (shouldFetchData) {

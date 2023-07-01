@@ -1,5 +1,5 @@
 import Footer from "../components/Footer/Index";
-import NavbarComp from "../components/Navbar/NavbarPublic";
+import NavbarComp from "../components/Navbar/NavbarUser";
 import DashboardComp from "../components/Dashboard/DashboardComp";
 
 const Dashboard = () => {

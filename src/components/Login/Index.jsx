@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -9,6 +9,16 @@ import Cookies from "js-cookie";
 const Login = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const loggedInUser = Cookies.get("loggedInUser");
+
+    if (loggedInUser && loggedInUser === "true") {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  }, []);
 
   const handleSubmit = async (values) => {
     try {
