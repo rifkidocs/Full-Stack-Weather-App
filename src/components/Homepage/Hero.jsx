@@ -1,7 +1,20 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Hero = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loggedInUser = Cookies.get("loggedInUser");
+
+    if (loggedInUser && loggedInUser === "true") {
+      navigate("/dashboard");
+    } else {
+      navigate("/cuaca");
+    }
+  }, []);
+
   return (
     <div className='hero min-h-screen bg-base-200'>
       <div className='hero-content text-center'>

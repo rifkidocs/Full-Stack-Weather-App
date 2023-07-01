@@ -77,7 +77,7 @@ const NavbarComp = () => {
           )}
         </div>
         <a
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/dashboard")}
           className='btn btn-ghost normal-case text-xl'>
           F.weather App
         </a>
