@@ -13,6 +13,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import weatherTranslations from "../../constants";
 import MainCard from "../Cuaca/MainCard";
 import ForecastCard from "../Cuaca/ForecastCard";
+import Cookies from "js-cookie";
 
 const Index = () => {
   // Menginisialisasi state dan hooks
@@ -25,6 +26,7 @@ const Index = () => {
   const [weatherData, setWeatherData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [showTable, setShowTable] = useState(false);
 
   useEffect(() => {
     // Mengatur pengubahan status otentikasi pengguna saat komponen dimuat
@@ -148,11 +150,20 @@ const Index = () => {
     setWeatherData((prevData) => prevData.filter((_, i) => i !== deleteIndex));
     setShowModal(false);
     setDeleteIndex(null);
+    setMaxError(false);
   };
 
   const handleShowDetail = () => {
     // Menangani logika untuk menampilkan detail modal di sini
     // Misalnya, mengatur variabel state untuk mengontrol keterlihatan modal
+  };
+
+  const handleShowTable = () => {
+    if (showTable) {
+      setShowTable(false);
+    } else {
+      setShowTable(true);
+    }
   };
 
   const closeModal = () => {
@@ -161,23 +172,33 @@ const Index = () => {
     setDeleteIndex(null);
   };
 
+  const displayUser = Cookies.get("displayUser");
+
   const renderLocationTable = () => {
     if (locations.length > 0) {
       return (
-        <table className='table-auto'>
-          <thead>
+        <table className='mt-3 w-full max-w-md text-sm text-left text-gray-500 dark:text-gray-400'>
+          <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
             <tr>
-              <th className='border px-4 py-2'>No</th>
-              <th className='border px-4 py-2'>Kota</th>
-              <th className='border px-4 py-2'>Action</th>
+              <th scope='col' className='px-6 py-3'>
+                No
+              </th>
+              <th scope='col' className='px-6 py-3'>
+                Kota
+              </th>
+              <th scope='col' className='px-6 py-3'>
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
             {locations.map((location, index) => (
-              <tr key={index}>
-                <td className='border px-4 py-2'>{index + 1}</td>
-                <td className='border px-4 py-2'>{location}</td>
-                <td className='border px-4 py-2'>
+              <tr
+                key={index}
+                className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                <td className='px-6 py-4'>{index + 1}</td>
+                <td className='px-6 py-4'>{location}</td>
+                <td className='px-6 py-4'>
                   <button
                     className='bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded'
                     onClick={() => handleDeleteLocation(index)}>
@@ -198,8 +219,11 @@ const Index = () => {
     // Render kartu-kartu cuaca
     if (weatherData.length > 0) {
       return weatherData.map((weather, index) => (
-        <div key={index}>
+        <div
+          className='min-w-full flex flex-col place-items-center py-3'
+          key={index}>
           <MainCard
+            key={index}
             weather={weather}
             forecast={selectedLocation === index}
             setForecast={() => handleSetForecast(index)}
@@ -220,8 +244,8 @@ const Index = () => {
   };
 
   return (
-    <div className='flex flex-col min-h-screen place-items-center justify-center py-3 px-3'>
-      <p className='text-xl font-bold px-2 xl:px-28 mb-3'>{`Halo`}</p>
+    <div className='flex flex-col items-center min-h-screen place-items-center justify-center py-3 px-3'>
+      <p className='text-xl font-bold px-2 xl:px-28 mb-3'>{`Halo ${displayUser}`}</p>
 
       <form
         className='flex justify-center place-items-center'
@@ -231,21 +255,42 @@ const Index = () => {
           placeholder='Tambahkan  Kota'
           type='text'
           value={cityName}
-          onChange={(e) => setCityName(e.target.value)}
+          onChange={(e) => {
+            setCityName(e.target.value);
+            setMaxError(false);
+          }}
           required
         />
-        {maxError && <span>Batas maksimal 5 field telah tercapai</span>}
         <button className='btn btn-primary' type='submit'>
           Tambahkan
         </button>
       </form>
+      {maxError && (
+        <span className='mt-2 text-red-500 italic'>
+          Batas maksimal 5 field telah tercapai
+        </span>
+      )}
 
-      {renderLocationTable()}
+      {showTable ? (
+        <button
+          onClick={() => {
+            handleShowTable();
+            setMaxError(false);
+          }}
+          className='btn bg-neutral normal-case mt-3'>
+          Sembunyikan Kota
+        </button>
+      ) : (
+        <button
+          onClick={handleShowTable}
+          className='btn btn-info normal-case mt-3'>
+          Tampilkan Kota
+        </button>
+      )}
 
-      <div>
-        <p>Data Lokasi Cuaca</p>
-        {renderWeatherCards()}
-      </div>
+      {showTable && renderLocationTable()}
+
+      {renderWeatherCards()}
 
       {showModal && (
         <dialog
@@ -258,7 +303,9 @@ const Index = () => {
               Apakah Anda yakin ingin menghapus lokasi ini?
             </p>
             <div className='modal-action'>
-              <button className='btn' onClick={confirmDeleteLocation}>
+              <button
+                className='btn btn-success'
+                onClick={confirmDeleteLocation}>
                 Hapus
               </button>
               <button className='btn' onClick={closeModal}>

@@ -2,7 +2,7 @@ import React from "react";
 
 const Forecast = ({ weather, weatherTranslations }) => {
   return (
-    <div className='mt-4 mx-3 w-full sm:w-auto'>
+    <div className='mt-4 w-full sm:w-auto'>
       <h3 className='text-2xl font-semibold mb-2 text-center'>
         Prakiraan Cuaca
       </h3>
