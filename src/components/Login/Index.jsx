@@ -34,7 +34,7 @@ const Login = () => {
         return;
       }
 
-      Cookies.set("loggedInUser", true, { expires: 365 });
+      Cookies.set("auth-token", user.refreshToken);
       Cookies.set("displayUser", auth.currentUser.displayName);
       Cookies.set("emailUser", auth.currentUser.email);
       navigate("/dashboard");

@@ -16,9 +16,9 @@ const Weather = () => {
   const [shouldFetchData, setShouldFetchData] = useState(false);
 
   useEffect(() => {
-    const loggedInUser = Cookies.get("loggedInUser");
+    const loggedInUser = Cookies.get("auth-token");
 
-    if (loggedInUser && loggedInUser === "true") {
+    if (loggedInUser) {
       navigate("/dashboard");
     } else {
       navigate("/cuaca");

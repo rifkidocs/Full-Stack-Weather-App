@@ -32,9 +32,9 @@ const Index = () => {
   const emailUser = Cookies.get("emailUser");
 
   useEffect(() => {
-    const loggedInUser = Cookies.get("loggedInUser");
+    const loggedInUser = Cookies.get("auth-token");
 
-    if (loggedInUser === "true") {
+    if (loggedInUser) {
       fetchData(auth?.currentUser?.email);
     } else {
       navigate("/login");
