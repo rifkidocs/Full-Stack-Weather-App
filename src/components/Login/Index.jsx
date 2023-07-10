@@ -11,7 +11,7 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const loggedInUser = Cookies.get("loggedInUser");
+    const loggedInUser = Cookies.get("auth-token");
 
     if (loggedInUser && loggedInUser === "true") {
       navigate("/dashboard");

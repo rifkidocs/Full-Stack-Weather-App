@@ -34,7 +34,7 @@ const NavbarComp = () => {
     signOut(auth)
       .then(() => {
         // Logout successful
-        Cookies.remove("loggedInUser");
+        Cookies.remove("auth-token");
         Cookies.remove("displayUser");
         Cookies.remove("emailUser");
         navigate("/login"); // Ganti "/login" dengan rute halaman login
