@@ -34,9 +34,11 @@ const Login = () => {
         return;
       }
 
-      Cookies.set("auth-token", user.refreshToken);
-      Cookies.set("displayUser", auth.currentUser.displayName);
-      Cookies.set("emailUser", auth.currentUser.email);
+      Cookies.set("auth-token", user.refreshToken, { expires: 365 });
+      Cookies.set("displayUser", auth.currentUser.displayName, {
+        expires: 365,
+      });
+      Cookies.set("emailUser", auth.currentUser.email, { expires: 365 });
       navigate("/dashboard");
     } catch (error) {
       console.log("Error signing in:", error.message);
